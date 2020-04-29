@@ -2,7 +2,7 @@ from flask import send_file
 from subprocess import call
 
 def render(request):
-    location = '/tmp/renders/'
+    location = '/tmp/'
     suffix = 'tempfile'
     filename = location + suffix + '0001.png'
     
@@ -12,8 +12,10 @@ def render(request):
     blender_file = "models/%s.blend" % scene
 
     # This script changes the text, it is run inside our 3D software. 
-    blender_expression = "import bpy; bpy.data.objects['Text'].data.body = '%s'" % message
+    blender_expression = f"import bpy; bpy.data.objects['Text'].data.body = '{message}'"
+    blender_expression = "import bpy"
+    command = f'../usr/local/blender/blender -b {blender_file} --python-expr "{blender_expression}" -o {location}frame_#### -f 1'
     # Render 3D image
-    call('blender -b %s --python-expr "%s" -o %s%s -f 1' % (blender_file, blender_expression, location, suffix), shell=True)
+    call(command, shell=True)
     
-    return send_file(filename, mimetype='image/png')
+    return send_file("/tmp/frame_0001.png", mimetype='image/png')
